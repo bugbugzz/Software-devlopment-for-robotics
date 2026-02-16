@@ -10,13 +10,20 @@ const size_t COLS = 12;
 // Define a type alias for the maze
 using MazeGrid = std::array<std::array<char, COLS>, ROWS>;
 
+// --- NEW: Scoped Enumerator for Direction ---
+enum class Direction {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+
 // --- Function Prototypes ---
 void printMaze(const MazeGrid& maze);
 bool traverseMaze(MazeGrid& maze, int row, int col, int startRow, int startCol);
 
 int main() {
     // Initialize the maze
-    // '.' = open path, '#' = wall, 'x' = start
     MazeGrid maze = {{
         {'#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'},
         {'#', '.', '.', '.', '#', '.', '.', '.', '.', '.', '.', '#'},
@@ -48,8 +55,6 @@ int main() {
     if (startRow != -1) {
         std::cout << "Starting at Row: " << startRow + 1 << ", Col: " << startCol + 1 << std::endl;
         
-        // Treat the start as a regular cell for the recursive function
-        // We temporarily set it to '.' so the function can 'step' on it validly
         maze[startRow][startCol] = '.'; 
 
         if (traverseMaze(maze, startRow, startCol, startRow, startCol)) {
@@ -67,8 +72,6 @@ int main() {
 // --- Function Definitions ---
 
 void printMaze(const MazeGrid& maze) {
-    // System clear command to make the animation look static in place
-    // Use "cls" for Windows, "clear" for Linux/Mac
     #ifdef _WIN32
         std::system("cls");
     #else
@@ -93,8 +96,6 @@ bool traverseMaze(MazeGrid& maze, int row, int col, int startRow, int startCol) 
     }
 
     // 2. Check if this is a valid move
-    // We can only step on dots '.'
-    // If it is a wall '#' or we have already visited it 'x', we stop.
     if (maze[row][col] != '.') {
         return false;
     }
@@ -104,32 +105,39 @@ bool traverseMaze(MazeGrid& maze, int row, int col, int startRow, int startCol) 
 
     // 4. Visualize the step
     printMaze(maze);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Slow down so user can watch
+    std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Adjust the delay as needed
 
     // 5. Check for Exit
-    // An exit is any spot on the edge of the board that is NOT the start point
     if (row == 0 || row == ROWS - 1 || col == 0 || col == COLS - 1) {
         if (row != startRow || col != startCol) {
-            return true; // We found the way out!
+            return true; 
         }
     }
 
-    // 6. Recursive Step: Try all 4 directions
-    // If ANY of these return true, it means the exit was found down that path.
-    
-    // Try UP
-    if (traverseMaze(maze, row - 1, col, startRow, startCol)) return true;
-    
-    // Try RIGHT
-    if (traverseMaze(maze, row, col + 1, startRow, startCol)) return true;
-    
-    // Try DOWN
-    if (traverseMaze(maze, row + 1, col, startRow, startCol)) return true;
-    
-    // Try LEFT
-    if (traverseMaze(maze, row, col - 1, startRow, startCol)) return true;
-    
-    maze[row][col] = '.'; // Uncomment this line if you only want to see the Winning Path
+    // 6. Recursive Step: LOOP through all directions
+    // Define the order of directions to check
+    const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT };
+
+    for (const auto& dir : directions) {
+        int nextRow = row;
+        int nextCol = col;
+
+        // Update coordinates based on the Direction enum
+        switch (dir) {
+            case Direction::UP:    nextRow--; break;
+            case Direction::RIGHT: nextCol++; break;
+            case Direction::DOWN:  nextRow++; break;
+            case Direction::LEFT:  nextCol--; break;
+        }
+
+        // Recursively call for the calculated next cell
+        if (traverseMaze(maze, nextRow, nextCol, startRow, startCol)) {
+            return true;
+        }
+    }
+
+    // 7. Backtracking
+    maze[row][col] = '.'; // Uncomment to see only correct path
     
     return false;
 }
