@@ -1,0 +1,14 @@
+# Ignore C++ object files
+*.o
+*.obj
+
+# Ignore executables (Windows)
+*.exe
+*.dll
+
+# Ignore executables (Mac/Linux)
+*.out
+*.app
+
+# Ignore VS Code settings (optional, but recommended)
+.vscode/
