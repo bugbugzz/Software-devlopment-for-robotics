@@ -1,3 +1,10 @@
+//=====================...........................=================================
+// Authors : Milou de Zwaan (2629070), Shatrunjay Palkar (3669734)
+// Group : 14
+// License : LGPL open source license
+//
+// Brief : this program implements a maze solver using a recursive backtracking algorithm. The maze is represented as a 2D grid, where '#' represents walls, '.' represents open paths, and 'x' represents the starting point. The program visualizes the maze-solving process by printing the maze at each step and introducing a delay to show the path being explored. The user can choose to see only the correct path or the entire exploration process by commenting/uncommenting the backtracking line.
+//=====================...........................=================================
 #include <iostream>
 #include <array>
 #include <thread> // Required for sleep_for
