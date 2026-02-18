@@ -3,11 +3,13 @@
 #include <thread>
 #include <chrono>
 
-// --- Constructor Logic ---
-// Initializes the maze and automatically finds the 'x' starting position
-MazeSolver::MazeSolver(MazeGrid initialMaze) : maze(initialMaze), startRow(-1), startCol(-1) {
-    for (int r = 0; r < ROWS; ++r) {
-        for (int c = 0; c < COLS; ++c) {
+// Constructor
+MazeSolver::MazeSolver(MazeSolver::MazeGrid initialMaze) 
+    : maze(initialMaze), startRow(-1), startCol(-1) {
+    
+    // Cast static constants to int for the loop
+    for (int r = 0; r < static_cast<int>(ROWS); ++r) {
+        for (int c = 0; c < static_cast<int>(COLS); ++c) {
             if (maze[r][c] == 'x') {
                 startRow = r;
                 startCol = c;
@@ -16,13 +18,10 @@ MazeSolver::MazeSolver(MazeGrid initialMaze) : maze(initialMaze), startRow(-1), 
     }
 }
 
-// --- Public solve() Method ---
-// The entry point for the logic previously inside main()
 void MazeSolver::solve() {
     if (startRow != -1) {
         std::cout << "Starting at Row: " << startRow + 1 << ", Col: " << startCol + 1 << std::endl;
         
-        // Clear the starting 'x' to treat it as an open path for the algorithm
         maze[startRow][startCol] = '.'; 
 
         if (traverse(startRow, startCol)) {
@@ -35,8 +34,6 @@ void MazeSolver::solve() {
     }
 }
 
-// --- Private printMaze() Method ---
-// Visualizes the maze using class variables directly
 void MazeSolver::printMaze() const {
     #ifdef _WIN32
         std::system("cls");
@@ -53,28 +50,23 @@ void MazeSolver::printMaze() const {
     std::cout << "--------------------------------" << std::endl;
 }
 
-// --- Private traverse() Method ---
-// Recursive backtracking logic. Note: maze and start coordinates 
-// are no longer passed as arguments as they are class members.
 bool MazeSolver::traverse(int row, int col) {
-    // 1. Check Bounds and Validity
-    if (row < 0 || row >= ROWS || col < 0 || col >= COLS || maze[row][col] != '.') {
+    // Check Bounds
+    if (row < 0 || row >= static_cast<int>(ROWS) || col < 0 || col >= static_cast<int>(COLS) || maze[row][col] != '.') {
         return false;
     }
 
-    // 2. Mark path and Visualize
     maze[row][col] = 'x';
     printMaze();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    // 3. Check for Exit
-    if (row == 0 || row == ROWS - 1 || col == 0 || col == COLS - 1) {
+    // Check Exit
+    if (row == 0 || row == static_cast<int>(ROWS) - 1 || col == 0 || col == static_cast<int>(COLS) - 1) {
         if (row != startRow || col != startCol) {
             return true; 
         }
     }
 
-    // 4. Recursive Step
     const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT };
 
     for (const auto& dir : directions) {
@@ -93,7 +85,6 @@ bool MazeSolver::traverse(int row, int col) {
         }
     }
 
-    // 5. Backtracking
     maze[row][col] = '.'; 
     return false;
 }
