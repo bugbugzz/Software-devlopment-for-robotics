@@ -80,12 +80,12 @@ bool MazeSolver::traverse(int row, int col) {
     // Define the possible directions to move (up, right, down, left)
     const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT }; 
 
-    // Explore each direction recursively, if any direction leads to the exit, return true. if false is returned, it backtracks.
+    // Recursive Step: Loop through all 4 directions
     for (const auto& dir : directions) {
         int nextRow = row;
         int nextCol = col;
 
-        // Update nextRow and nextCol based on the current direction
+        // Update coordinates based on direction
         switch (dir) {
             case Direction::UP:    nextRow--; break;
             case Direction::RIGHT: nextCol++; break;
@@ -93,12 +93,21 @@ bool MazeSolver::traverse(int row, int col) {
             case Direction::LEFT:  nextCol--; break;
         }
 
-        // Recursively traverse the next cell. if it returns true, the exit has been found.
+        // attempt to solve the maze starting from the 'next' cell.
+        // If traverse() returns true, it means the exit was found down that path.
+        // We immediately return true to propagate the success "up" the chain of function calls.
+         // If traverse() returns false, it means that direction was a dead end.
+        // The loop continues automatically to try the next direction.
         if (traverse(nextRow, nextCol)) {
             return true;
         }
     }
 
+    //BACKTRACKING STEP:
+    // If the loop finishes, it means we tried ALL directions from this cell 
+    // and none of them led to the exit. This cell is part of a dead-end path
+
     maze[row][col] = '.'; 
-    return false;
+    
+    return false; // Signal to the previous caller that this path failed.
 }
