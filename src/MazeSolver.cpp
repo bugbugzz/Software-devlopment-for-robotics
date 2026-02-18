@@ -1,21 +1,20 @@
-//=====================...........................=================================
+//=============================================================================
 // Authors : Milou de Zwaan (2629070), Shatrunjay Palkar (3669734)
 // Group : 14
 // License : LGPL open source license
-//
-// Brief : Implementation of the recursive maze solver. it contains the logic to traverse the maze, print the current state of the maze, and determine if the exit has been found.
-//=====================...........................=================================
+// Brief : Implementation of the recursive maze solver logic.
+//=============================================================================
 
-#include "MazeSolver.h" // Include the MazeSolver header to implement the class methods
-#include <iostream> // Required for input/output operations
-#include <thread> // Required for std::this_thread::sleep_for
-#include <chrono> // Required for std::chrono::milliseconds
+#include "MazeSolver.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
-// Constructor
+// --- CONSTRUCTOR ---
 MazeSolver::MazeSolver(MazeSolver::MazeGrid initialMaze) 
     : maze(initialMaze), startRow(-1), startCol(-1) {
     
-    // Find the starting position 'x' in the maze by iterating through the grid
+    // Scan the grid to locate the starting point 'x'
     for (int r = 0; r < static_cast<int>(ROWS); ++r) {
         for (int c = 0; c < static_cast<int>(COLS); ++c) {
             if (maze[r][c] == 'x') {
@@ -26,12 +25,15 @@ MazeSolver::MazeSolver(MazeSolver::MazeGrid initialMaze)
     }
 }
 
-// Public method to start solving the maze, by calling the private traverse method
+// --- PUBLIC SOLVE METHOD ---
 void MazeSolver::solve() {
-    if (startRow != -1) { // Check if a starting point was found
+    if (startRow != -1) {
         std::cout << "Starting at Row: " << startRow + 1 << ", Col: " << startCol + 1 << std::endl;
+        
+        // Clear the start position so it can be traversed
         maze[startRow][startCol] = '.'; 
-        if (traverse(startRow, startCol)) { // If traverse returns true, the maze is solved
+
+        if (traverse(startRow, startCol)) {
             std::cout << "\nMAZE SOLVED!" << std::endl;
         } else {
             std::cout << "\nNO EXIT FOUND." << std::endl;
@@ -41,7 +43,7 @@ void MazeSolver::solve() {
     }
 }
 
-// Private method to print the current state of the maze to the console, to visualize the traversal process. It clears the console before printing the maze.
+// --- VISUALIZATION HELPER ---
 void MazeSolver::printMaze() const {
     #ifdef _WIN32
         std::system("cls");
@@ -58,34 +60,48 @@ void MazeSolver::printMaze() const {
     std::cout << "--------------------------------" << std::endl;
 }
 
-// Private method to traverse the maze recursively. it checks for valid moves, marks the path.
+// --- RECURSIVE TRAVERSAL LOGIC ---
 bool MazeSolver::traverse(int row, int col) {
-    // Check Bounds
-    if (row < 0 || row >= static_cast<int>(ROWS) || col < 0 || col >= static_cast<int>(COLS) || maze[row][col] != '.') {
+    /* ---------------------------------------------------------
+       1. Boundary check    
+       Check if we are out of bounds or hitting a wall/visited cell.
+       --------------------------------------------------------- */
+    if (row < 0 || row >= static_cast<int>(ROWS) || 
+        col < 0 || col >= static_cast<int>(COLS) || 
+        maze[row][col] != '.') {
         return false;
     }
 
-    // Mark the current cell as part of the path
+    /* ---------------------------------------------------------
+       2. mark and print
+       Mark this cell as 'visited' (x) and show it on screen.
+       --------------------------------------------------------- */
     maze[row][col] = 'x';
     printMaze();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Pause for 500 milliseconds to visualize the traversal
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-    // Check Exit
-    if (row == 0 || row == static_cast<int>(ROWS) - 1 || col == 0 || col == static_cast<int>(COLS) - 1) {
+    /* ---------------------------------------------------------
+       3. Check for exit
+       If we reached the border (and it's not the start), we win.
+       --------------------------------------------------------- */
+    if (row == 0 || row == static_cast<int>(ROWS) - 1 || 
+        col == 0 || col == static_cast<int>(COLS) - 1) {
         if (row != startRow || col != startCol) {
             return true; 
         }
     }
 
-    // Define the possible directions to move (up, right, down, left)
-    const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT }; 
+    /* ---------------------------------------------------------
+       4. recursive exploration
+       Try moving in all 4 directions. If a path returns true,
+       we propagate that success up the call stack.
+       --------------------------------------------------------- */
+    const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT };
 
-    // Recursive Step: Loop through all 4 directions
     for (const auto& dir : directions) {
         int nextRow = row;
         int nextCol = col;
 
-        // Update coordinates based on direction
         switch (dir) {
             case Direction::UP:    nextRow--; break;
             case Direction::RIGHT: nextCol++; break;
@@ -93,15 +109,15 @@ bool MazeSolver::traverse(int row, int col) {
             case Direction::LEFT:  nextCol--; break;
         }
 
-        // attempt to solve the maze starting from the 'next' cell.
-        // If traverse() returns true, it means the exit was found down that path.
-        // Immediately return true to signal the success along the chain of function calls.
-         // If traverse() returns false, it means that direction was a dead end.
-        // The loop continues automatically to try the next direction.
         if (traverse(nextRow, nextCol)) {
             return true;
         }
     }
-    
-    return false; // Signal to the previous caller that this path failed.
+
+    /* ---------------------------------------------------------
+       5. DEAD END
+       If loop finishes, no exit was found from here.
+       Note: We leave 'x' marked to show this area was visited.
+       --------------------------------------------------------- */
+    return false;
 }

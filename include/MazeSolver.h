@@ -1,26 +1,28 @@
-//=====================...........................=================================
+//=============================================================================
 // Authors : Milou de Zwaan (2629070), Shatrunjay Palkar (3669734)
 // Group : 14
 // License : LGPL open source license
-//
-// Brief : contains the declaration of the MazeSolver class, which implements a recursive maze solver.
-//=====================...........................=================================
+// Brief : Declaration of the MazeSolver class for recursive maze solving.
+//=============================================================================
 
-#ifndef MAZESOLVER_H // Include guard to prevent multiple inclusions
-#define MAZESOLVER_H // Include necessary headers
+#ifndef MAZESOLVER_H
+#define MAZESOLVER_H
 
-#include <array> // Required for std::array
+#include <array>
 #include <cstddef> // Required for size_t
 
 class MazeSolver {
 public:
-    // constants must be static constexpr to define array size
+    // --- CONSTANTS ---
+    // Static constexpr ensures these are known at compile time for array sizing
     static constexpr std::size_t ROWS = 12;
     static constexpr std::size_t COLS = 12;
 
-    // Define the type alias using the constants above
+    // --- TYPES ---
+    // Alias for the 2D grid structure
     using MazeGrid = std::array<std::array<char, COLS>, ROWS>;
 
+    // Scoped enum for navigation directions
     enum class Direction {
         UP,
         RIGHT,
@@ -28,19 +30,26 @@ public:
         LEFT
     };
 
-    // Constructor
+    // --- CONSTRUCTOR ---
+    /**
+     * @brief Initializes the solver with a given maze.
+     * @param initialMaze The grid containing walls, paths, and start point.
+     */
     MazeSolver(MazeGrid initialMaze);
 
-    // Public method to start solving the maze
+    // --- PUBLIC METHODS ---
+    /**
+     * @brief Starts the maze solving process.
+     */
     void solve();
 
 private:
-    // Maze grid and starting position
-    MazeGrid maze;
-    int startRow;
-    int startCol;
+    // --- MEMBER VARIABLES ---
+    MazeGrid maze; // The 2D grid representing the current state of the maze
+    int startRow;  // Cached row index of the starting position 'x'
+    int startCol;  // Cached column index of the starting position 'x'
 
-    // Private helper methods
+    // --- HELPER METHODS ---
     void printMaze() const;
     bool traverse(int row, int col);
 };
