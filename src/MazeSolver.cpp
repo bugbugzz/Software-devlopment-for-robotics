@@ -41,7 +41,7 @@ void MazeSolver::solve() {
     }
 }
 
-// Private method to print the current state of the maze to the console
+// Private method to print the current state of the maze to the console, to visualize the traversal process. It clears the console before printing the maze.
 void MazeSolver::printMaze() const {
     #ifdef _WIN32
         std::system("cls");
@@ -95,19 +95,13 @@ bool MazeSolver::traverse(int row, int col) {
 
         // attempt to solve the maze starting from the 'next' cell.
         // If traverse() returns true, it means the exit was found down that path.
-        // We immediately return true to propagate the success "up" the chain of function calls.
+        // Immediately return true to signal the success along the chain of function calls.
          // If traverse() returns false, it means that direction was a dead end.
         // The loop continues automatically to try the next direction.
         if (traverse(nextRow, nextCol)) {
             return true;
         }
     }
-
-    //BACKTRACKING STEP:
-    // If the loop finishes, it means we tried ALL directions from this cell 
-    // and none of them led to the exit. This cell is part of a dead-end path
-
-    maze[row][col] = '.'; 
     
     return false; // Signal to the previous caller that this path failed.
 }
