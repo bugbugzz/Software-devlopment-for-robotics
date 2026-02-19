@@ -92,22 +92,22 @@ bool MazeSolver::traverseMaze(int row, int col) {
 
     /* ---------------------------------------------------------
        4. recursive exploration
-       Try moving in all 4 directions. If a path returns true,
+       Try moving in all 4 direction. If a path returns true,
        we propagate that success up the call stack.
        --------------------------------------------------------- */
-    const Direction directions[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT };
+    const Direction direction[] = { Direction::UP, Direction::RIGHT, Direction::DOWN, Direction::LEFT };
 
-    for (const auto& dir : directions) {
+    for (const auto& dir : direction) {
         int nextRow = row;
         int nextCol = col;
-
+        //scoped enum allows us to use a switch statement for cleaner direction handling
         switch (dir) {
             case Direction::UP:    nextRow--; break;
             case Direction::RIGHT: nextCol++; break;
             case Direction::DOWN:  nextRow++; break;
             case Direction::LEFT:  nextCol--; break;
         }
-
+        // Recursive call to explore the next cell in the chosen direction
         if (traverseMaze(nextRow, nextCol)) {
             return true;
         }
