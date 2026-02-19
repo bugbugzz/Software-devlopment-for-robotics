@@ -50,7 +50,7 @@ void MazeSolver::printMaze() const {
     #else
         std::system("clear"); // linux/macOS clear screen command
     #endif
-
+    
     for (const auto& row : maze) {
         for (const auto& cell : row) {
             std::cout << cell << ' ';
@@ -112,11 +112,5 @@ bool MazeSolver::traverseMaze(int row, int col) {
             return true;
         }
     }
-
-    /* ---------------------------------------------------------
-       5. DEAD END
-       If loop finishes, no exit was found from here.
-       Note: We leave 'x' marked to show this area was visited.
-       --------------------------------------------------------- */
     return false;
 }
