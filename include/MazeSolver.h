@@ -19,7 +19,7 @@ public:
     static constexpr std::size_t COLS = 12;
 
     // --- TYPES ---
-    // Alias for the 2D grid structure
+    // Alias for the 2D grid structure,aliasing a 2D array of chars for better readability
     using MazeGrid = std::array<std::array<char, COLS>, ROWS>;
 
     // Scoped enum for navigation directions
@@ -51,7 +51,7 @@ private:
 
     // --- HELPER METHODS ---
     void printMaze() const;
-    bool traverse(int row, int col);
+    bool traverseMaze(int row, int col);
 };
 
 #endif // MAZESOLVER_H

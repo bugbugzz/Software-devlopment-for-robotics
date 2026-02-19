@@ -14,12 +14,12 @@
 MazeSolver::MazeSolver(MazeSolver::MazeGrid initialMaze) 
     : maze(initialMaze), startRow(-1), startCol(-1) {
     
-    // Scan the grid to locate the starting point 'x'
-    for (int r = 0; r < static_cast<int>(ROWS); ++r) {
-        for (int c = 0; c < static_cast<int>(COLS); ++c) {
-            if (maze[r][c] == 'x') {
-                startRow = r;
-                startCol = c;
+    // Scan the grid to locate the starting point 'x'    
+    for (const auto& row : maze) {
+        for (const auto& cell : row) {
+            if (cell == 'x') {
+                startRow = &row - maze.data(); // Calculate row index
+                startCol = &cell - row.data(); // Calculate column index
             }
         }
     }
@@ -33,7 +33,7 @@ void MazeSolver::solve() {
         // Clear the start position so it can be traversed
         maze[startRow][startCol] = '.'; 
 
-        if (traverse(startRow, startCol)) {
+        if (traverseMaze(startRow, startCol)) {
             std::cout << "\nMAZE SOLVED!" << std::endl;
         } else {
             std::cout << "\nNO EXIT FOUND." << std::endl;
@@ -46,9 +46,9 @@ void MazeSolver::solve() {
 // --- VISUALIZATION HELPER ---
 void MazeSolver::printMaze() const {
     #ifdef _WIN32
-        std::system("cls");
+        std::system("cls"); // Windows clear screen command
     #else
-        std::system("clear");
+        std::system("clear"); // linux/macOS clear screen command
     #endif
 
     for (const auto& row : maze) {
@@ -57,11 +57,10 @@ void MazeSolver::printMaze() const {
         }
         std::cout << '\n';
     }
-    std::cout << "--------------------------------" << std::endl;
 }
 
 // --- RECURSIVE TRAVERSAL LOGIC ---
-bool MazeSolver::traverse(int row, int col) {
+bool MazeSolver::traverseMaze(int row, int col) {
     /* ---------------------------------------------------------
        1. Boundary check    
        Check if we are out of bounds or hitting a wall/visited cell.
@@ -109,7 +108,7 @@ bool MazeSolver::traverse(int row, int col) {
             case Direction::LEFT:  nextCol--; break;
         }
 
-        if (traverse(nextRow, nextCol)) {
+        if (traverseMaze(nextRow, nextCol)) {
             return true;
         }
     }
